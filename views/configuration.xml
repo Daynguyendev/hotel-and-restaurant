@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- ======== Menu Root ======== -->
+    <menuitem
+            id="hotel_management_menu"
+            name="Hotel Management"
+            web_icon="sea_hotel_restaurant,static/description/hotel.png"
+    />
+
+    <!-- ======== Menu Configuration ======== -->
+    <menuitem id="hotel_configuration_menu" name="Configuration"
+              sequence="20" parent="hotel_management_menu"/>
+
+    <!-- ======== Branch ======== -->
+    <!-- Form view of hotel restaurant branch -->
+    <record id="view_hotel_restaurant_branch_form" model="ir.ui.view">
+        <field name="name">Branch Form View</field>
+        <field name="model">sea.hotel.restaurant.branch</field>
+        <field name="arch" type="xml">
+            <form>
+                <div class="oe_title">
+                    <label for="company_id" string="Company"/>
+                    <h3>
+                        <field name="company_id" readonly="1"/>
+                    </h3>
+                    <label for="warehouse_id" string="Warehouse"/>
+                    <h3>
+                        <field name="warehouse_id" required="1"/>
+                    </h3>
+                    <label for="name" string="Branch' Name"/>
+                    <h1>
+                        <field name="name"/>
+                    </h1>
+                    <separator string="Branch Users" colspan="4"/>
+                    <label for="user_id" string="Manager"/>
+                    <h3>
+                        <field name="user_id"/>
+                    </h3>
+                    <label for="user_ids" string="Users"/>
+                    <h3>
+                        <field name="user_ids" widget="many2many_tags" required="1"/>
+                    </h3>
+
+
+                </div>
+                <div>
+                    <separator string="Point of Sale" colspan="4"/>
+                    <group>
+                        <field name="hotel_restaurant_pos_ids" colspan="4" nolabel="1">
+                            <tree>
+                                <field name="name" string="Pos's Name"/>
+                                <field name="pos_type" string="Pos's Type"/>
+                            </tree>
+                        </field>
+                    </group>
+                </div>
+
+                <div>
+                    <separator string="Pricing" colspan="4"/>
+                    <label for="iface_tax_included" string="Display sale price within tax"/>
+                    <h3>
+                        <field name="iface_tax_included" widget="radio"/>
+                    </h3>
+                    <label for="available_pricelist_ids" string="Available pricelists"/>
+                    <h3>
+                        <field name="available_pricelist_ids" widget="many2many_tags"
+                               help='Make several pricelists available in branch. '/>
+                    </h3>
+                    <separator string="Order and booking" colspan="4"/>
+                    <label for="digit_of_discount" string="Digits of Discount"/>
+                    <h3>
+                        <field name="digit_of_discount"/>
+                    </h3>
+
+                    <separator string="Accounting" colspan="4"/>
+                    <label for="payment_journal_ids" string="Payment Journals" required="1"/>
+                    <h3>
+                        <field name="payment_journal_ids" widget="many2many_tags" required="1"/>
+                    </h3>
+                    <h3>
+                        <field name="invoice_journal_id" required="1"/>
+                    </h3>
+
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree view of hotel restaurant branch -->
+    <record id="view_hotel_restaurant_branch_tree" model="ir.ui.view">
+        <field name="name">Branch Tree View</field>
+        <field name="model">sea.hotel.restaurant.branch</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" string="Branch's Name"/>
+                <field name="user_id" string="Manager"/>
+                <field name="user_ids" string="Users" widget="many2many_tags"/>
+                <field name="company_id" string="Company" readonly="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action of hotel restaurant branch -->
+    <record id="open_hotel_restaurant_branch_form_tree" model="ir.actions.act_window">
+        <field name="name">Branch</field>
+        <field name="res_model">sea.hotel.restaurant.branch</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('company_id', 'in', company_ids)]
+        </field>
+    </record>
+
+    <menuitem id="menu_open_hotel_restaurant_branch_form_tree" name="Branch"
+              action="open_hotel_restaurant_branch_form_tree" sequence="20"
+              parent="hotel_configuration_menu"/>
+
+    <!-- ======== Area ======== -->
+    <!-- Form view of hotel restaurant area -->
+    <record id="view_hotel_restaurant_area_form" model="ir.ui.view">
+        <field name="name">Hotel Restaurant Area Form</field>
+        <field name="model">sea.hotel.restaurant.area</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="company_id" readonly="1"/>
+                    <field name="name" colspan="1"/>
+                    <field name="pos_hotel_restaurant_id"/>
+                    <field name="room_ids" required="1"/>
+                    <field name="table_ids"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree view of hotel restaurant area -->
+    <record id="view_hotel_restaurant_area_tree" model="ir.ui.view">
+        <field name="name">Hotel Restaurant Area Tree</field>
+        <field name="model">sea.hotel.restaurant.area</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="company_id" readonly="1"/>
+<!--                <field name="branch_id" required="1"/>-->
+<!--                <field name="pos_hotel_restaurant_id"/>-->
+                <field name="name" colspan="1"/>
+<!--                <field name="area_type"/>-->
+            </tree>
+        </field>
+    </record>
+
+    <!-- Action of hotel restaurant area -->
+    <record id="open_hotel_restaurant_area_form_tree" model="ir.actions.act_window">
+        <field name="name">Hotel &amp; Restaurant Area</field>
+        <field name="res_model">sea.hotel.restaurant.area</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('company_id', 'in', company_ids)]
+        </field>
+
+    </record>
+
+    <menuitem id="menu_open_hotel_restaurant_area_form_tree" name="Area"
+              action="open_hotel_restaurant_area_form_tree" sequence="21"
+              parent="hotel_configuration_menu"/>
+</odoo>

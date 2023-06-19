@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hotel_restaurant_branch,sea.hotel.restaurant.branch,model_sea_hotel_restaurant_branch,,1,1,1,1
+access_pos_hotel_restaurant,sea.pos.hotel.restaurant,model_sea_pos_hotel_restaurant,,1,1,1,1
+access_sea_folio,sea.folio,model_sea_folio,,1,1,1,1
+access_restaurant_table,sea.restaurant.table,model_sea_restaurant_table,,1,1,1,1
+access_hotel_restaurant_area,sea.hotel.restaurant.area,model_sea_hotel_restaurant_area,,1,1,1,1
+access_hotel_room_type,sea.hotel.room.type,model_sea_hotel_room_type,,1,1,1,1
+access_hotel_room,sea.hotel.room,model_sea_hotel_room,,1,1,1,1
+access_hotel_room_line,sea.hotel.room.line,model_sea_hotel_room_line,,1,1,1,1

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <template id="kitchen_asset_backend" name="Kitchen Asset" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/sea_hotel_restaurant/static/src/js/kitchen.js"></script>
+            <script type="text/javascript" src="/sea_hotel_restaurant/static/src/js/table_create_order.js"></script>
+            <script type="text/javascript" src="/sea_hotel_restaurant/static/src/js/payment.js"></script>
+<!--            <script type="text/javascript" src="/sea_hotel_restaurant/static/src/js/room_management.js"></script>-->
+        </xpath>
+    </template>
+</odoo>

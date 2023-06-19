@@ -1,0 +1,25 @@
+{
+    "name": "Hotel and Restaurant Management 1.0.0",
+    "version": "1.0.0",
+    "author": "SeaTek",
+    "category": "Hotel and Restaurant Management",
+    "website": "",
+    "depends": ['account', 'sale', 'discount_sale_order', 'discount_account_invoice', 'product'],
+    "license": "AGPL-3",
+    "summary": "Hotel Management to Manage Folio and Hotel Configuration",
+    "data": [
+        "security/ir.model.access.csv",
+        "views/configuration.xml",
+        "views/dashboard.xml",
+        "views/folio.xml",
+        "views/table.xml",
+        "views/room.xml",
+        "views/restaurant.xml",
+        "views/hotel.xml",
+        "views/tablevirtual.xml",
+    ],
+    "qweb": [
+    ],
+    "images": ["static/description/hotel.png"],
+    "application": True,
+}

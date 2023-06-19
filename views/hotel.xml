@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- ====== Hotel ====== -->
+    <!-- Form view of hotel Orders -->
+    <record id="hotel_order_form_view" model="ir.ui.view">
+        <field name="name">Hotel Orders Form</field>
+        <field name="model">sale.order</field>
+        <field name="priority" eval="20"/>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="confirm_order" string="Confirm Order" class="btn-primary" type="object"
+                            attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                    <button name="lock_hotel_order" type="object" string="Lock(Tạm tính)" class="btn-primary"
+                            attrs="{'invisible': [('state', '!=', 'sale')]}"/>
+                    <button name="move_room" type="object" class="oe_highlight"
+                            string="Chuyển phòng" context="{'action': 1}"/>
+                    <button name="unlock_sale_order" type="object" class="btn-primary" string="Unlock"
+                            attrs="{'invisible': [('state', '!=', 'done')]}"/>
+<!--                    <button name="validate_sale_order"-->
+<!--                            string="Validate"-->
+<!--                            class="btn-primary"-->
+<!--                            type="object"-->
+<!--                            attrs="{'invisible': ['|',('state', '!=', 'done'),('delivery_status', '!=', 'not delivered')]}"/>-->
+                    <button name="cleaned_room"
+                            string="Cleaned Room"
+                            class="btn-primary"
+                            type="object"
+                            attrs="{'invisible': [('status_room','!=','cleaned')]}"/>
+                    <button name="print_provision_receipt"
+                            string="Print Provision Receipt"
+                            class="btn-primary"
+                            type="object"
+                            attrs="{'invisible': ['|',('state','!=','done'),('invoice_count','!=',0)]}"/>
+                    <button name="print_bill"
+                            string="Print Bill"
+                            class="btn-primary"
+                            type="object"
+                            attrs="{'invisible': ['|',('state','!=','done'),('invoice_count','=',0)]}"/>
+                    <field name="state" select="2" widget="statusbar"
+                           statusbar_visible="draft,sent,sale,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_folio_view"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-shopping-bag"
+                                attrs="{'invisible': [('folio_id', 'in',[None, False] )]}">Folio
+                        </button>
+                        <button name="action_view_invoice"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-pencil-square-o"
+                                attrs="{'invisible': [('invoice_count', '=', 0)]}">
+                            <field name="invoice_count" invisible="1"/>Invoices
+                        </button>
+                        <button type="object"
+                                name="action_view_delivery"
+                                class="oe_stat_button"
+                                icon="fa-truck"
+                                attrs="{'invisible': [('delivery_count', '=', 0)]}" groups="base.group_user">
+                            <field name="delivery_count" widget="statinfo" string="Delivery"/>
+                        </button>
+                    </div>
+                    <label for="name" string="Hotel Order No"/>
+                    <h1>
+                        <field name="name" colspan="4" readonly="1"/>
+                    </h1>
+                    <group colspan="4" col="4">
+                        <field name="date_order" readonly="1"/>
+                    </group>
+                    <separator string="Order Info" colspan="4"/>
+                    <group colspan="4" col="4">
+                        <field name="status_room" invisible="1"/>
+                        <field name="user_id" string="Sale Person" readonly="1"/>
+                        <field name="folio_id"
+                               context="{'folio_display_name': True}"
+                               options="{'no_create': 1, 'no_open': 1}"/>
+                        <field name="order_type" string="Order Type" readonly="1"/>
+                    </group>
+                    <separator string="Customer Info" colspan="4"/>
+                    <group colspan="4" col="4">
+                        <field name="company_id"/>
+                        <field name="partner_id" string="Guest Name"
+                               required="1" domain="[('customer','=',True)]"/>
+                        <field name="pricelist_id"/>
+                        <field name="pos_hotel_restaurant_id" invisible="1"/>
+                        <field name="invoice_status" invisible="1"/>
+                        <field name="delivery_status" invisible="1"/>
+                    </group>
+                    <separator string="List Room Order" colspan="4"/>
+                    <group>
+                        <field name="room_id"/>
+                    </group>
+                    <group>
+                        <field name="order_line" colspan="4" nolabel="1">
+                            <!-- ====== Hotel Order Line Tree View ====== -->
+                            <tree editable="top" string="List room order">
+                                <field name="room_id"
+                                       context="{'partner_id':parent.partner_id,'quantity':product_uom_qty,'pricelist':parent.pricelist_id,'uom':product_uom}"
+                                       domain="[('pos_hotel_restaurant_id','=',parent.pos_hotel_restaurant_id),
+                                                ('status', '=', 'available'), ('id', '=', parent.room_id)]"/>
+                                <field name="product_id"/>
+                                <field name="checkin_date"/>
+                                <field name="checkout_date"/>
+                                <field name="product_uom_qty"
+                                       context="{'partner_id':parent.partner_id,'quantity':product_uom_qty,'pricelist':parent.pricelist_id,'uom':product_uom}"
+                                       string="Quantity"/>
+                                <field name="qty_reserved" string="Quantity Done"/>
+                                <field name="product_uom" invisible="1"/>
+                                <field name="price_unit" string="Sale price"/>
+                                <field name="taxes_id" widget="many2many_tags"/>
+                                <field name="price_total" string="Total"/>
+                                <field name="remarks" string="Notes"/>
+                            </tree>
+                        </field>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="global_discount_type"
+                                   groups="discount_account_invoice.group_order_global_discount" class="oe_inline"
+                                   attrs="{'required' :[('global_order_discount', '>', 0.0)], 'readonly' : [('state', 'in', ['sale', 'done'])]}"/>
+                            <field name="global_order_discount"
+                                   groups="discount_account_invoice.group_order_global_discount" class="oe_inline"
+                                   attrs="{'readonly' : [('state', 'in', ['sale', 'done'])]}"/>
+                        </group>
+                        <group class="oe_subtotal_footer oe_right" colspan="2" name="sale_total">
+                            <field name="amount_untaxed" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                            <field name="amount_tax" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                            <field name="total_discount" widget='monetary'
+                                   groups="sale.group_discount_per_so_line, discount_account_invoice.group_order_global_discount"
+                                   options="{'currency_field': 'currency_id'}"/>
+                            <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                                <label for="amount_total"/>
+                            </div>
+                            <field name="amount_total" nolabel="1" class="oe_subtotal_footer_separator"
+                                   widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree view of hotel Orders -->
+    <record id="hotel_order_tree_view" model="ir.ui.view">
+        <field name="name">Hotel Orders Tree</field>
+        <field name="model">sale.order</field>
+        <field name="priority" eval="20"/>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" string="Order No"/>
+                <field name="date_order" string="Order Date"/>
+                <field name="check_in"/>
+                <field name="check_out"/>
+                <field name="note"/>
+                <field name="room_id"/>
+                <field name="partner_id" string="Customer"/>
+                <field name="amount_total" string="Total"/>
+                <field name="state" string="Status"/>
+                <field name="order_type" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search view of Orders-->
+    <record id="order_search_view" model="ir.ui.view">
+        <field name="name">Orders Search</field>
+        <field name="model">sale.order</field>
+        <field eval="4" name="priority"/>
+        <field name="arch" type="xml">
+            <search>
+                <filter name="order_draft" string="Quotation" domain="[('state', '=', 'draft')]"/>
+                <filter name="order_sent" string="Quotation Sent" domain="[('state', '=', 'sent')]"/>
+                <filter name="order_sale" string="Sales Order" domain="[('state', '=', 'sale')]"/>
+                <filter name="order_done" string="Locked" domain="[('state', '=', 'done')]"/>
+                <filter name="order_cancel" string="Cancelled" domain="[('state', '=', 'cancel')]"/>
+                <group string="Group By" name="groupby">
+                    <filter name="state" string="State" context="{'group_by': 'state'}"/>
+                    <filter name="folio_id" string="Folio" context="{'group_by': 'folio_id'}"/>
+                    <filter name="room_id" string="Room" context="{'group_by': 'room_id'}"/>
+                    <filter name="table_id" string="Table" context="{'group_by': 'table_id'}"/>
+                    <filter name="partner_id" string="Customer" context="{'group_by': 'partner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>
