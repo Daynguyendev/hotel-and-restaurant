@@ -19,18 +19,7 @@
                             context="{'action': 1}"/>
                     <button name="move_table" type="object" class="oe_highlight"
                             string="Chuyển bàn" context="{'action': 1}"/>
-<!--                    <button name="splitting_table" type="object" string="Tách bàn" class="oe_highlight"-->
-<!--                            context="{'action': 1}"/>-->
-<!--                    <button name="validate_sale_order"-->
-<!--                            string="Validate"-->
-<!--                            class="btn-primary"-->
-<!--                            type="object"-->
-<!--                            attrs="{'invisible': ['|','|',('state', '!=', 'done'),('is_hotel_guest','=',False),('delivery_status', '!=', 'not delivered')]}"/>-->
-<!--                    <button name="validate_sale_order"-->
-<!--                            string="Create Receipt"-->
-<!--                            class="btn-primary"-->
-<!--                            type="object"-->
-<!--                            attrs="{'invisible': ['|','|',('state', '!=', 'done'),('is_hotel_guest','=',True),('delivery_status', '!=', 'not delivered')]}"/>-->
+
                     <button name="print_provision_receipt"
                             string="Print Provision Receipt"
                             class="btn-primary"
@@ -41,31 +30,29 @@
                             class="btn-primary"
                             type="object"
                             attrs="{'invisible': ['|',('state','!=','done'),('invoice_count','=',0)]}"/>
-<!--                    <button name="open_account_payment_view" type="object" class="btn-primary" string="Payment Invoice"-->
-<!--                            attrs="{'invisible': [('can_be_pay', '!=', True)]}"/>-->
                     <field name="state" select="2" widget="statusbar"
                            statusbar_visible="draft,sent,sale,done"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button name="action_open_folio_view"
-                            type="object"
-                            class="oe_stat_button"
-                            icon="fa-shopping-bag"
-                            attrs="{'invisible': [('folio_id', 'in',[None, False] )]}">Folio
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-shopping-bag"
+                                attrs="{'invisible': [('folio_id', 'in',[None, False] )]}">Folio
                         </button>
                         <button name="action_view_invoice"
-                            type="object"
-                            class="oe_stat_button"
-                            icon="fa-pencil-square-o"
-                            attrs="{'invisible': [('invoice_count', '=', 0)]}">
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-pencil-square-o"
+                                attrs="{'invisible': [('invoice_count', '=', 0)]}">
                             <field name="invoice_count" invisible="1"/>Invoices
                         </button>
                         <button type="object"
-                            name="action_view_delivery"
-                            class="oe_stat_button"
-                            icon="fa-truck"
-                            attrs="{'invisible': [('delivery_count', '=', 0)]}" groups="base.group_user">
+                                name="action_view_delivery"
+                                class="oe_stat_button"
+                                icon="fa-truck"
+                                attrs="{'invisible': [('delivery_count', '=', 0)]}" groups="base.group_user">
                             <field name="delivery_count" widget="statinfo" string="Delivery"/>
                         </button>
                     </div>
@@ -80,39 +67,29 @@
                     <separator string="Order Info" colspan="4"/>
                     <group colspan="4" col="4">
                         <field name="user_id" string="Sale Person" readonly="1"/>
-    <!--                    <field name="is_hotel_guest" string="Is Hotel Guest?" readonly="0"/>-->
                         <field name="order_type" string="Order Type" readonly="1"/>
-                        <field name="folio_id"/>
-    <!--                           attrs="{'invisible': [('is_hotel_guest','=',False)], 'required': [('is_hotel_guest','=',True)]}"-->
-    <!--                           context="{'folio_display_name': True}"-->
-    <!--                           options="{'no_create': 1, 'no_open': 1}"/>-->
+                        <field name="folio_id" domain="[('customer_id', '=', partner_id),('state', '=', 'inprogress')]"/>
+                        <field name="state_folio" string="State Folio"/>
+
                     </group>
                     <separator string="Customer Info" colspan="4"/>
                     <group colspan="4" col="4">
-                         <field name="company_id" readonly="1" />
-                        <field name="partner_id" string="Guest Name"
-                               required="1" domain="[('customer','=',True)]"/>
-    <!--                    <field name="partner_invoice_id"-->
-    <!--                           domain="[('parent_id','=',partner_id)]"/>-->
-                        <field name="pricelist_id"/>
-    <!--                    <field name="partner_shipping_id"-->
-    <!--                           domain="[('parent_id','=',partner_id)]"/>-->
-    <!--                    <field name="payment_term_id" />-->
+                        <field name="company_id" readonly="1"/>
+                        <field name="partner_id" string="Guest Name (Partner_id Gốc Không sửa)"
+                               domain="[('type', '=', 'contact'), ('parent_id', '=', False),('customer','=',True), ('active','=',True)]"
+                        />
+                        <field name="partner_id_hr" string="Guest Name Hotel Restaurant"
+                               domain="[('type', '=', 'contact'), ('parent_id', '=', False),('customer','=',True), ('active','=',True)]"
+                               attrs="{'readonly': [('state_folio', '!=','inprogress'), ('state', 'not in',['draft','sent','sale'])]}"
+                        />
+                        <field name="pricelist_id"
+                        attrs="{'readonly': [('state', 'not in',['draft','sent','sale'])]}"/>
                         <field name="pos_hotel_restaurant_id" invisible="1"/>
                         <field name="delivery_status" invisible="1"/>
-    <!--                    <field name="can_be_pay" invisible="1"/>-->
                     </group>
                     <!-- List table order view -->
                     <separator string="Table" colspan="4"/>
                     <field name="table_id" required="1"/>
-    <!--                <group>-->
-    <!--                    <field name="table_list" colspan="4" nolabel="1">-->
-    <!--                        <tree>-->
-    <!--                            <field name="name"/>-->
-    <!--                            <field name="hotel_restaurant_area_id"/>-->
-    <!--                        </tree>-->
-    <!--                    </field>-->
-    <!--                </group>-->
                     <!-- List restaurant order view -->
                     <separator string="List Order" colspan="4"/>
                     <group>
@@ -136,25 +113,32 @@
                     </group>
                     <group>
                         <group>
-                            <field name="global_discount_type" groups="discount_account_invoice.group_order_global_discount" class="oe_inline" attrs="{'required' :[('global_order_discount', '>', 0.0)], 'readonly' : [('state', 'in', ['sale', 'done'])]}"/>
-                            <field name="global_order_discount" groups="discount_account_invoice.group_order_global_discount" class="oe_inline" attrs="{'readonly' : [('state', 'in', ['sale', 'done'])]}"/>
+                            <field name="global_discount_type"
+                                   groups="discount_account_invoice.group_order_global_discount" class="oe_inline"
+                                   attrs="{'required' :[('global_order_discount', '>', 0.0)], 'readonly' : [('state', 'in', ['sale', 'done'])]}"/>
+                            <field name="global_order_discount"
+                                   groups="discount_account_invoice.group_order_global_discount" class="oe_inline"
+                                   attrs="{'readonly' : [('state', 'in', ['sale', 'done'])]}"/>
                         </group>
                         <group class="oe_subtotal_footer oe_right" colspan="2" name="sale_total">
                             <field name="amount_untaxed" widget='monetary' options="{'currency_field': 'currency_id'}"/>
                             <field name="amount_tax" widget='monetary' options="{'currency_field': 'currency_id'}"/>
-                            <field name="total_discount" widget='monetary' groups="sale.group_discount_per_so_line, discount_account_invoice.group_order_global_discount" options="{'currency_field': 'currency_id'}"/>
+                            <field name="total_discount" widget='monetary'
+                                   groups="sale.group_discount_per_so_line, discount_account_invoice.group_order_global_discount"
+                                   options="{'currency_field': 'currency_id'}"/>
                             <div class="oe_subtotal_footer_separator oe_inline o_td_label">
-                                <label for="amount_total" />
+                                <label for="amount_total"/>
                             </div>
-                            <field name="amount_total" nolabel="1" class="oe_subtotal_footer_separator" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                            <field name="amount_total" nolabel="1" class="oe_subtotal_footer_separator"
+                                   widget='monetary' options="{'currency_field': 'currency_id'}"/>
                         </group>
                     </group>
                 </sheet>
-                    <div class="oe_chatter">
-                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
-                        <field name="activity_ids" widget="mail_activity"/>
-                        <field name="message_ids" widget="mail_thread"/>
-                    </div>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
             </form>
         </field>
     </record>
@@ -169,8 +153,7 @@
                 <field name="name" string="Order No"/>
                 <field name="date_order" string="Order Date"/>
                 <field name="partner_id" string="Customer"/>
-<!--                <field name="table_list" widget="many2many_tags" string="Tables"/>-->
-                <field name="table_id" />
+                <field name="table_id"/>
                 <field name="amount_total" string="Total"/>
                 <field name="state" string="Status"/>
                 <field name="order_type" invisible="1"/>

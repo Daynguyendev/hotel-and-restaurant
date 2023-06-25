@@ -21,7 +21,7 @@ class POSHotelRestaurant(models.Model):
     ], string="POS's Type", default="restaurant", require=True)
 
     '''POS users'''
-    user_ids = fields.Many2many('res.users', string='POS User')
+    user_ids = fields.Many2many('res.users', string='POS User', domain=lambda self: [("company_id", "in", self.env.user.company_ids.ids)])
 
     '''POS Display '''
     limit_categories = fields.Boolean("Restrict Available Product Categories")
@@ -54,7 +54,7 @@ class POSHotelRestaurant(models.Model):
     invoice_journal_id = fields.Many2one("account.journal", string="Accounting invoice journal")
 
     '''Order and Booking'''
-    customer_default_id = fields.Many2one("res.partner", string='Customer default',
+    customer_default_id = fields.Many2one("res.partner", string='Customer default', required=True,
                                           domain="[('company_id', '=', company_id)]")
     digit_of_discount = fields.Integer(string="Digits of Discount")
 

@@ -1,5 +1,4 @@
 from odoo import _, api, fields, models
-from lxml import etree
 
 class AccountPayment(models.Model):
     _inherit = "account.payment"

@@ -20,13 +20,7 @@ class Folio(models.Model):
     folio_sequence = fields.Char("Folio sequence", readonly=True, default=lambda self: _('New'), index=True)
     folio_name = fields.Char("Folio Name")
     order_date = fields.Datetime(string="Create Date", required=True, default=_get_current_datetime, readonly=True)
-
-    '''???'''
-    # hotel_order_ids = fields.One2many("sale.order", "folio_id_hotel")
-    # restaurant_order_ids = fields.One2many("sale.order", "folio_id_restaurant")
     order_ids = fields.One2many("sale.order", "folio_id")
-    ''''''
-
     customer_id = fields.Many2one("res.partner", string='Customer', required=True)
     state = fields.Selection([
         ('draft', 'Draft'),
@@ -43,17 +37,37 @@ class Folio(models.Model):
                                 domain=lambda self: self.domain_branch_by_user(), require=True)
     invoice_id = fields.Many2one("account.invoice", "Invoice", copy=False)
     amount_untaxed = fields.Monetary(string='Untaxed Amount', currency_field='currency_id', store=True, readonly=True,
-                                     compute='_compute_amount_price', track_visibility='onchange', track_sequence=5)
+                                     compute='_compute_total_price', track_visibility='onchange', track_sequence=5)
     amount_tax = fields.Monetary(string='Taxes', currency_field='currency_id', store=True, readonly=True,
-                                 compute='_compute_amount_price')
+                                 compute='_compute_total_price')
     amount_total = fields.Monetary(string='Total', currency_field='currency_id', store=True,
-                                   readonly=True, compute='_compute_amount_price',
+                                   readonly=True, compute='_compute_total_price',
                                    track_visibility='always', track_sequence=6)
     total_discount = fields.Monetary(string='Discount', currency_field='currency_id',
-                                     store=True, readonly=True, compute='_compute_amount_price',
+                                     store=True, readonly=True, compute='_compute_total_price',
                                      track_visibility='always')
     currency_id = fields.Many2one('res.currency', string="Currency",
                                   default=lambda self: self.env.user.company_id.currency_id)
+    order_current = fields.Many2many("sale.order", string="Order Current")
+
+    @api.multi
+    @api.depends("order_ids", "order_ids.amount_total",
+                 "order_ids.amount_total")
+    def _compute_total_price(self):
+        for folio in self:
+            amount_untaxed = amount_tax = total_discount = 0.0
+
+            for order in folio.order_ids:
+                amount_untaxed += order.amount_untaxed
+                amount_tax += order.amount_tax
+                total_discount += order.total_discount
+
+            folio.update({
+                "amount_untaxed": amount_untaxed,
+                "amount_tax": amount_tax,
+                "total_discount": total_discount,
+                "amount_total": amount_untaxed + amount_tax
+            })
 
     @api.model
     def domain_branch_by_user(self):
@@ -67,15 +81,16 @@ class Folio(models.Model):
 
     @api.model
     def create(self, vals):
-        # print('test vals cua folio old', vals)
+        print('vao create folio', vals)
+
         if vals.get('folio_sequence', _('New')) == _('New'):
+            print('test vals company', vals)
             if 'company_id' in vals:
                 vals['folio_sequence'] = self.env['ir.sequence'].with_context(
                     force_company=vals['company_id']).next_by_code(
                     'seatek.folio') or _('New')
             else:
                 vals['folio_sequence'] = self.env['ir.sequence'].next_by_code('seatek.folio') or _('New')
-
 
         customer_id = self.env["res.partner"].sudo().search([("id", "=", vals["customer_id"])])
         vals["folio_name"] = customer_id.display_name
@@ -114,58 +129,19 @@ class Folio(models.Model):
         domain = args + ["|", ("folio_sequence", operator, folio_name), ("folio_name", operator, folio_name)]
         return super(Folio, self).search(domain, limit=limit).name_get()
 
-    # @api.multi
-    # @api.depends("hotel_order_ids", "restaurant_order_ids", "hotel_order_ids.amount_total", "restaurant_order_ids.amount_total")
-    # def _compute_amount_price(self):
-    #     """
-    #     Compute the total amounts of the SO.
-    #     """
-    #     for folio in self:
-    #         amount_untaxed = amount_tax = total_discount = 0.0
-    #
-    #         for order in folio.hotel_order_ids:
-    #             amount_untaxed += order.amount_untaxed
-    #             amount_tax += order.amount_tax
-    #             total_discount += order.total_discount
-    #
-    #         for order in folio.restaurant_order_ids:
-    #             amount_untaxed += order.amount_untaxed
-    #             amount_tax += order.amount_tax
-    #             total_discount += order.total_discount
-    #
-    #         folio.update({
-    #             "amount_untaxed": amount_untaxed,
-    #             "amount_tax": amount_tax,
-    #             "total_discount": total_discount,
-    #             "amount_total": amount_untaxed + amount_tax
-    #         })
-    #
-    # @api.multi
-    # def create_invoice(self):
-    #     if not self.hotel_order_ids and not self.restaurant_order_ids:
-    #         raise ValidationError(_("Can't create invoice when hotel order or restaurant order is empty"))
-    #         return
-    #     sale_orders = self.env["sale.order"].search(
-    #         ["|", ("id", "in", self.restaurant_order_ids.ids), ("id", "in", self.hotel_order_ids.ids)])
-    #     for order in sale_orders:
-    #         if order.state != "done":
-    #             order.confirm_order()
-    #     invoice_id = sale_orders.action_invoice_create()
-    #     self.invoice_id = invoice_id[0]
-    #     self.state = "done"
-    #
-
     @api.multi
     def lock_invoice_temp(self):
         if not self.order_ids:
             raise ValidationError(_("Can't create invoice when hotel order or restaurant order is empty"))
             return
-        sale_orders = self.env["sale.order"].search(
-            [("id", "in", self.order_ids.ids)])
-        for order in sale_orders:
+        sale_order_current = self.env['sale.order'].search([("id", "in", self.order_ids.ids), ('state', '!=', 'done')])
+        self.order_current = [(6, 0, sale_order_current.ids)]
+        print('test sale_order_current', self.order_current)
+        for order in sale_order_current:
+
             if order.room_id:
                 order.lock_hotel_order()
-            if order.table_id:
+            elif order.table_id:
                 order.lock_restaurant_order()
         self.state = "done"
 
@@ -174,9 +150,7 @@ class Folio(models.Model):
         if not self.order_ids:
             raise ValidationError(_("Can't create invoice when hotel order or restaurant order is empty"))
             return
-        sale_orders = self.env["sale.order"].search(
-            [("id", "in", self.order_ids.ids)])
-        for order in sale_orders:
+        for order in self.order_current:
             order.write({'state': 'sale'})
         self.state = "inprogress"
 

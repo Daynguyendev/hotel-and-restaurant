@@ -16,9 +16,9 @@ class HotelRestaurantBranch(models.Model):
     warehouse_id = fields.Many2one('stock.warehouse', string='Warehouse')
 
     '''Branch users'''
-    user_id = fields.Many2one('res.users', 'Manager User', required=1, domain="[('company_id', '=', company_id)]")
+    user_id = fields.Many2one('res.users', 'Manager User', required=1, domain=lambda self: [("company_id", "in", self.env.user.company_ids.ids)])
     user_ids = fields.Many2many('res.users', 'hotel_restaurant_branch_user_rel', 'branch_id', 'user_id',
-                                string='POS Users', domain="[('company_id', '=', company_id)]")
+                                string='POS Users', domain=lambda self: [("company_id", "in", self.env.user.company_ids.ids)])
 
     '''POS'''
     hotel_restaurant_pos_ids = fields.One2many('sea.pos.hotel.restaurant', 'hotel_restaurant_branch_id',

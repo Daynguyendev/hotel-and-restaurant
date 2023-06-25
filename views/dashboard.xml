@@ -1,44 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-    <!-- ##################### -->
-    <!--    <record id="action_parent_open_restaurant_order" model="ir.actions.act_window">-->
-    <!--        <field name="name">Restaurant Order</field>-->
-    <!--        <field name="res_model">sale.order</field>-->
-    <!--        <field name="view_type">form</field>-->
-    <!--        <field name="view_mode">tree,form</field>-->
-    <!--        <field name="view_id" eval="False"/>-->
-    <!--    </record>-->
-
-    <!--    <record id="action_child_open_restaurant_order_tree" model="ir.actions.act_window.view">-->
-    <!--        <field name="view_mode">tree</field>-->
-    <!--        <field name="view_id" ref="sea_hotel_restaurant.restaurant_order_tree_view"/>-->
-    <!--        <field name="act_window_id" ref="action_parent_open_restaurant_order"/>-->
-    <!--    </record>-->
-
-    <!--    <record id="action_child_open_restaurant_order_form" model="ir.actions.act_window.view">-->
-    <!--        <field name="view_mode">form</field>-->
-    <!--        <field name="view_id" ref="sea_hotel_restaurant.restaurant_order_form_view"/>-->
-    <!--        <field name="act_window_id" ref="action_parent_open_restaurant_order"/>-->
-    <!--    </record>-->
-
-    <!--    <record model="ir.actions.server" id="action_open_restaurant_order_view">-->
-    <!--        <field name="name">Action server restaurant order</field>-->
-    <!--        <field name="model_id" ref="sale.model_sale_order"/>-->
-    <!--        <field name="type">ir.actions.server</field>-->
-    <!--        <field name="state">code</field>-->
-    <!--        <field name="code">-->
-    <!--action_values = env.ref('sea_hotel_restaurant.action_parent_open_restaurant_order').read()[0]-->
-    <!--if env.context:-->
-    <!--   pos_id = env.context['active_id']-->
-    <!--else:-->
-    <!--   pos_id = env.params['active_id']-->
-    <!--context = env.context-->
-    <!--context.update({'search_default_order_draft': 1})-->
-    <!--action_values.update({'context': context})-->
-    <!--action_values.update({'domain': [('order_type', '=', 'restaurant_order'), ('pos_hotel_restaurant_id', '=', pos_id)]})-->
-    <!--action = action_values-->
-    <!--        </field>-->
-    <!--    </record>-->
 
     <!-- ======== POS ======== -->
     <!-- Kanban view of dashboard -->
@@ -76,18 +37,7 @@
                                             class="btn-primary"
                                             attrs="{'invisible': [('pos_type', '!=', 'restaurant')]}">Restaurant Order
                                     </button>
-<!--                                    <button-->
-<!--                                            name="action_open_table_order_view"-->
-<!--                                            type="object"-->
-<!--                                            class="btn-primary"-->
-<!--                                            attrs="{'invisible': [('pos_type', '!=', 'restaurant')]}">Table List-->
-<!--                                    </button>-->
-<!--                                    <button-->
-<!--                                            name="action_open_restaurant_kitchen_view"-->
-<!--                                            type="object"-->
-<!--                                            class="btn-primary"-->
-<!--                                            attrs="{'invisible': [('pos_type', '!=', 'restaurant')]}">Kitchen Order-->
-<!--                                    </button>-->
+
                                 </div>
                             </div>
                         </div>
@@ -106,7 +56,8 @@
                 <div class="oe_title">
                     <separator/>
                     <group colspan="4" col="4">
-                        <field name="company_id" string="Company" options="{'no_create': 1, 'no_open': 1}" readonly="1"/>
+                        <field name="company_id" string="Company" options="{'no_create': 1, 'no_open': 1}"
+                               readonly="1"/>
                     </group>
                     <group colspan="4" col="4">
                         <field name="hotel_restaurant_branch_id" string="Branch" require="1"
@@ -136,7 +87,7 @@
                                options="{'no_create': 1, 'no_open': 1}"/>
                     </group>
                     <group colspan="4" col="4">
-                        <field name="qty_available_product"/>
+                        <field name="qty_available_product" string="Show quanity available product (Maintained)"/>
                     </group>
                     <separator string="Pricing" colspan="4"/>
                     <group colspan="2" col="2">
@@ -152,8 +103,8 @@
 
                     <separator string="Inventory" colspan="4"/>
                     <group colspan="4" col="4">
-                        <field name="picking_type_id" options="{'no_create': 1, 'no_open': 1}"/>
-                        <field name="pos_location_id" options="{'no_create': 1, 'no_open': 1}"/>
+                        <field name="picking_type_id" options="{'no_create': 1, 'no_open': 1}" readonly="1" domain="[('default_route_id', '=', default_route_id)]"/>
+                        <field name="pos_location_id" options="{'no_create': 1, 'no_open': 1}" readonly="1"/>
                         <field name="default_route_id" required="1"/>
                         <field name="custom_routes_id" widget="many2many_tags"/>
                     </group>

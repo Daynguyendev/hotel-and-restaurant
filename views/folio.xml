@@ -47,11 +47,7 @@
                     <field name="company_id" readonly="1"/>
                     <field name="branch_id" required="1"/>
                     <field name="state"/>
-<!--                    <field name="partner_invoice_id"-->
-<!--                           domain="[('parent_id','=',partner_id)]"/>-->
-<!--                    <field name="partner_shipping_id"-->
-<!--                           domain="[('parent_id','=',partner_id)]"/>-->
-<!--                    <field name="payment_term_id"/>-->
+
                 </group>
                 <notebook>
                     <page name="hotel_orders" string="Orders">
@@ -87,7 +83,7 @@
                                     <separator string="Customer Info" colspan="4"/>
                                     <group colspan="4" col="4">
                                         <field name="company_id"/>
-                                        <field name="partner_id" string="Guest Name"
+                                        <field name="partner_id" string="Guest Name (Partner_id)"
                                                required="1"/>
                                         <field name="pricelist_id"/>
 

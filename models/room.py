@@ -19,38 +19,16 @@ class Room(models.Model):
     hotel_restaurant_area_id = fields.Many2one(
         "sea.hotel.restaurant.area", string="Area", help="At which area the room is located.",
         domain="[('company_id', '=', company_id)]"
-        # domain = "[('pos_hotel_restaurant_id', '=', pos_hotel_restaurant_id)]"
     )
     room_type_id = fields.Many2one(
         "sea.hotel.room.type", String="Room Type",
         domain="[('company_id', '=', company_id)]"
-        # domain="[('pos_hotel_restaurant_id', '=', pos_hotel_restaurant_id)]"
     )
     product_ids = fields.Many2many("product.product", "sea_room_product_rel", "room_id", "product_id", string="Room Available")
     product_default = fields.Many2one("product.product",required=True, string="Room Default")
     default_amenities = fields.One2many(
         "sea.hotel.room.line", "product_sea_hotel_room", string="Default amenities")
     # branch = fields.Many2one('sea.hotel.restaurant.branch', string='Branch')
-    # @api.onchange('branch')
-    # def _onchange_pos_hotel_restaurant(self):
-    #         res = {}
-    #         res['domain'] = {
-    #             'pos_hotel_restaurant_id': [('hotel_restaurant_branch_id', '=', self.branch.id)]}
-    #         return res
-
-    # @api.model
-    # def domain_pos_by_user(self):
-    #     user_branch = []
-    #     branches = self.env["sea.hotel.restaurant.branch"].sudo().search([])
-    #     for branch in branches:
-    #         if self.env.user.partner_id.id in [user.partner_id.id for user in branch.user_ids]:
-    #             user_branch.append(branch.id)
-    #     domain = [
-    #         ("company_id", "=", self.env.user.company_id.id),
-    #         ("hotel_restaurant_branch_id", "in", user_branch),
-    #         ("pos_type", "=", "hotel"),
-    #     ]
-    #     return domain
 
     @api.multi
     def write(self, vals):
@@ -66,19 +44,6 @@ class Room(models.Model):
         for room in self:
             if room.capacity <= 0:
                 raise ValidationError(_("Room capacity must be more than 0"))
-
-    # @api.onchange("available")
-    # def room_status_change(self):
-    #     """
-    #     Based on isroom, status will be updated.
-    #     ----------------------------------------
-    #     @param self: object pointer
-    #     """
-    #     if self.available is False:
-    #         self.status = "occupied"
-    #     if self.available is True:
-    #         self.status = "available"
-
 
 class HotelRoomLine(models.Model):
     _name = "sea.hotel.room.line"

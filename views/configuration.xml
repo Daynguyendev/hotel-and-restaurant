@@ -57,7 +57,7 @@
 
                 <div>
                     <separator string="Pricing" colspan="4"/>
-                    <label for="iface_tax_included" string="Display sale price within tax"/>
+                    <label for="iface_tax_included" string="Display sale price within tax (Maintained)"/>
                     <h3>
                         <field name="iface_tax_included" widget="radio"/>
                     </h3>
@@ -93,7 +93,7 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name" string="Branch's Name"/>
-                <field name="user_id" string="Manager"/>
+                <field name="user_id" string="Manager" />
                 <field name="user_ids" string="Users" widget="many2many_tags"/>
                 <field name="company_id" string="Company" readonly="1"/>
             </tree>
@@ -139,10 +139,7 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="company_id" readonly="1"/>
-<!--                <field name="branch_id" required="1"/>-->
-<!--                <field name="pos_hotel_restaurant_id"/>-->
                 <field name="name" colspan="1"/>
-<!--                <field name="area_type"/>-->
             </tree>
         </field>
     </record>

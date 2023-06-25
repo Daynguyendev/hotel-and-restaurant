@@ -1,11 +1,8 @@
-from datetime import datetime, timedelta
-
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 from odoo.exceptions import ValidationError
-from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo.tools.float_utils import float_compare, float_is_zero
-
+from odoo.addons import decimal_precision as dp
 
 class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
@@ -31,17 +28,14 @@ class SaleOrderLine(models.Model):
     #         checkout_date = checkin_date + timedelta(days=1)
     #         return checkout_date.strftime(DEFAULT_SERVER_DATETIME_FORMAT)
 
-    # @api.multi
-    # def _compute_table_list(self):
-    #     for rec in self:
-    #         rec.table_list = rec.order_id.table_list
+
 
     @api.multi
     def _compute_tax_list(self):
         for rec in self:
             rec.taxes_id = rec.product_id.product_tmpl_id.taxes_id
 
-    qty_reserved = fields.Float(string="Quantity Done", default=0.0)
+    qty_reserved = fields.Float(string="Quantity Done", default=0.0, digits=dp.get_precision('Stock Weight'), store=True, compute_sudo=True)
     checkin_date = fields.Datetime(string="Check In")
     checkout_date = fields.Datetime(string="Check Out", )
     room_id = fields.Many2one("sea.hotel.room", string="Room No",
@@ -86,12 +80,13 @@ class SaleOrderLine(models.Model):
 
     @api.model
     def create(self, vals):
-        # print("order line", vals)
         # if 'checkin_date' not in vals and 'checkout_date' not in vals and 'room_id' in vals:
             # vals['checkin_date'] = self._get_checkin_date()
             # vals['checkout_date'] = self._get_checkout_date()
             # super(SaleOrderLine, self).product_id_change()
         order = self.env['sale.order'].sudo().search([('id', '=', vals.get('order_id'))])
+        if vals.get('order_id') != True and vals.get('checkin_date') != True and vals.get('checkout_date') != True:
+              vals["room_id"] = order.room_id.id
         if order:
             if order.order_type:
                 if 'product_id' in vals:

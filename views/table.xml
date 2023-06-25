@@ -14,7 +14,6 @@
             <form string="Tables Detail">
                 <group colspan="4" col="4">
                     <field name="company_id" readonly="1"/>
-<!--                    <field name="branch_id" required="1"/>-->
                     <field name="pos_hotel_restaurant_id"/>
                     <field name="hotel_restaurant_area_id"/>
                     <field name="name"/>
@@ -47,7 +46,6 @@
         <field name="arch" type="xml">
             <tree string="Tables Detail">
                 <field name="company_id"/>
-<!--                <field name="branch_id" required="1"/>-->
                 <field name="pos_hotel_restaurant_id"/>
                 <field name="hotel_restaurant_area_id"/>
                 <field name="name"/>

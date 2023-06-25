@@ -17,11 +17,6 @@
                             string="Chuyển phòng" context="{'action': 1}"/>
                     <button name="unlock_sale_order" type="object" class="btn-primary" string="Unlock"
                             attrs="{'invisible': [('state', '!=', 'done')]}"/>
-<!--                    <button name="validate_sale_order"-->
-<!--                            string="Validate"-->
-<!--                            class="btn-primary"-->
-<!--                            type="object"-->
-<!--                            attrs="{'invisible': ['|',('state', '!=', 'done'),('delivery_status', '!=', 'not delivered')]}"/>-->
                     <button name="cleaned_room"
                             string="Cleaned Room"
                             class="btn-primary"
@@ -66,7 +61,14 @@
                     <label for="name" string="Hotel Order No"/>
                     <h1>
                         <field name="name" colspan="4" readonly="1"/>
+
+
                     </h1>
+                    <group colspan="4" col="4">
+                        <field name="check_in" />
+                        <field name="check_out" />
+                    </group>
+
                     <group colspan="4" col="4">
                         <field name="date_order" readonly="1"/>
                     </group>
@@ -76,22 +78,28 @@
                         <field name="user_id" string="Sale Person" readonly="1"/>
                         <field name="folio_id"
                                context="{'folio_display_name': True}"
-                               options="{'no_create': 1, 'no_open': 1}"/>
+                               options="{'no_create': 1, 'no_open': 1}" domain="[('customer_id', '=', partner_id), ('state', '=', 'inprogress')]"/>
+                        <field name="state_folio" string="State Folio"/>
                         <field name="order_type" string="Order Type" readonly="1"/>
                     </group>
                     <separator string="Customer Info" colspan="4"/>
                     <group colspan="4" col="4">
                         <field name="company_id"/>
-                        <field name="partner_id" string="Guest Name"
-                               required="1" domain="[('customer','=',True)]"/>
-                        <field name="pricelist_id"/>
+                        <field name="partner_id"  string="Guest Name (Partner_id Gốc Không sửa)"
+                               required="1" domain="[('customer','=',True)]" />
+                        <field name="partner_id_hr" string="Guest Name Hotel Restaurant"
+                               domain="[('type', '=', 'contact'), ('parent_id', '=', False),('customer','=',True), ('active','=',True)]"
+                               attrs="{'readonly': [('state_folio', '!=','inprogress'), ('state', 'not in',['draft','sent','sale'])]}"
+                        />
+                        <field name="pricelist_id"
+                        attrs="{'readonly': [('state', 'not in',['draft','sent','sale'])]}"/>
                         <field name="pos_hotel_restaurant_id" invisible="1"/>
                         <field name="invoice_status" invisible="1"/>
                         <field name="delivery_status" invisible="1"/>
                     </group>
                     <separator string="List Room Order" colspan="4"/>
                     <group>
-                        <field name="room_id"/>
+                        <field name="room_id" required="1"/>
                     </group>
                     <group>
                         <field name="order_line" colspan="4" nolabel="1">
